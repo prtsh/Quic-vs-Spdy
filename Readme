@@ -1,0 +1,76 @@
+Project contains four scripts are useful-
+1. automator.py - this automates the traffic shaping and HAR capturing
+2. runchrome.py - run chrome with Quic enabled/disabled in a headless and 
+                  benchmark mode
+3. trafficshaper.sh - this shapes the traffic
+
+How to enable Quic in google chrome?
+1. chrome://flags/
+2. Find Experimental QUIC protocol
+3. Change the setting to "enable"
+4. Restart chrome
+
+How to verify whether Quic is enabled or not?
+1. got to: chrome://net-export/
+2. start logging, save the log files, example- FILE: /Users/pratyushkr/Downloads/chrome-net-export-log.json
+3. Reload the testing websites
+4. Then go to https://netlog-viewer.appspot.com/#import
+5. Load the saved json log file and click on the Quic tab to see the log.json
+
+How to setup chrome-har-capturer to capture har files?
+1. Install capturer: npm install -g chrome-har-capturer
+2. run chrome -  sudo /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --remote-debugging-port=9222 --headless --enable-benchmarking --enable-net-benchmarking --enable-quic
+3. run chrome-har-capturer: xargs chrome-har-capturer -o baseline.har < urls.txt 
+
+
+How to parse har files for loadtime caluclation?
+1. install jq: brew install jq
+2. use the below command to see the load time 
+   jq -r '.log.pages[] | [.pageTimings.onLoad, .title]|@tsv' baseline.har
+
+How to shape the traffic for a given bandwidth and packet loss?
+1. see the man pagr at: https://www.unix.com/man-page/mojave/8/dnctl/ 
+2. see the file trafficshaper.sh
+
+Command Line cheat sheet for traffic shaping.
+0. dnctl and pfctl are built-in in macOS, install iperf: brew install iperf
+1. Setup server: iperf -s
+2. run a client for  7 seconds: iperf -c localhost -t 7
+3. show all rules:
+    sudo dnctl list
+    sudo pfctl -sa -v -v
+4. shape traffic:
+    (cat /etc/pf.conf && echo "dummynet-anchor \"mop\"" && echo "anchor \"mop\"") | sudo pfctl -f -
+    echo "dummynet in quick proto tcp from any to any port 5001 pipe 1" | sudo pfctl -a mop -f -
+    sudo dnctl pipe 1 config bw 1Mbit/s
+5. Observe traffic:
+    iperf  -s -D # Run as Daemon (-D)
+    iperf -c localhost -t 5 
+6. Add 20ms delay:
+    sudo dnctl pipe 1 config delay 20
+7. 3% packet loss:
+    sudo dnctl pipe 1 config plr 0.03
+8. Reset pipe, undo any changes:
+    sudo dnctl -q flush
+    sudo pfctl -f /etc/pf.conf
+
+Command line utility for HAR -
+-h, --help               output usage information
+-t, --host <host>        Chrome Debugging Protocol host
+-p, --port <port>        Chrome Debugging Protocol port
+-x, --width <dip>        frame width in DIP
+-y, --height <dip>       frame height in DIP
+-o, --output <file>      write to file instead of stdout
+-c, --content            also capture the requests body
+-k, --cache              allow caching
+-a, --agent <agent>      user agent override
+-b, --block <URL>        URL pattern (*) to block (can be repeated)
+-H, --header <header>    Additional headers (can be repeated)
+-i, --insecure           ignore certificate errors
+-g, --grace <ms>         time to wait after the load event
+-u, --timeout <ms>       time to wait before giving up with a URL
+-r, --retry <number>     number of retries on page load failure
+-e, --retry-delay <ms>   time to wait before starting a new attempt
+-f, --abort-on-failure   stop after the first failure (incompatible with parallel mode)
+-d, --post-data <bytes>  maximum POST data size to be returned
+-l, --parallel <n>       load <n> URLs in parallel
