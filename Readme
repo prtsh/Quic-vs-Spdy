@@ -1,38 +1,38 @@
-Project contains four scripts are useful-
+#Project contains four scripts -
 1. automator.py - this automates the traffic shaping and HAR capturing
 2. runchrome.py - run chrome with Quic enabled/disabled in a headless and 
                   benchmark mode
 3. trafficshaper.sh - this shapes the traffic
 
-How to enable Quic in google chrome?
+#How to enable Quic in google chrome?
 1. chrome://flags/
 2. Find Experimental QUIC protocol
 3. Change the setting to "enable"
 4. Restart chrome
 
-How to verify whether Quic is enabled or not?
+#How to verify whether Quic is enabled or not?
 1. got to: chrome://net-export/
 2. start logging, save the log files, example- FILE: /Users/pratyushkr/Downloads/chrome-net-export-log.json
 3. Reload the testing websites
 4. Then go to https://netlog-viewer.appspot.com/#import
 5. Load the saved json log file and click on the Quic tab to see the log.json
 
-How to setup chrome-har-capturer to capture har files?
+#How to setup chrome-har-capturer to capture har files?
 1. Install capturer: npm install -g chrome-har-capturer
 2. run chrome -  sudo /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --remote-debugging-port=9222 --headless --enable-benchmarking --enable-net-benchmarking --enable-quic
 3. run chrome-har-capturer: xargs chrome-har-capturer -o baseline.har < urls.txt 
 
 
-How to parse har files for loadtime caluclation?
+#How to parse har files for loadtime caluclation?
 1. install jq: brew install jq
 2. use the below command to see the load time 
    jq -r '.log.pages[] | [.pageTimings.onLoad, .title]|@tsv' baseline.har
 
-How to shape the traffic for a given bandwidth and packet loss?
+#How to shape the traffic for a given bandwidth and packet loss?
 1. see the man pagr at: https://www.unix.com/man-page/mojave/8/dnctl/ 
 2. see the file trafficshaper.sh
 
-Command Line cheat sheet for traffic shaping.
+#Command Line cheat sheet for traffic shaping.
 0. dnctl and pfctl are built-in in macOS, install iperf: brew install iperf
 1. Setup server: iperf -s
 2. run a client for  7 seconds: iperf -c localhost -t 7
@@ -54,7 +54,7 @@ Command Line cheat sheet for traffic shaping.
     sudo dnctl -q flush
     sudo pfctl -f /etc/pf.conf
 
-Command line utility for HAR -
+#Command line utility for HAR -
 -h, --help               output usage information
 -t, --host <host>        Chrome Debugging Protocol host
 -p, --port <port>        Chrome Debugging Protocol port
