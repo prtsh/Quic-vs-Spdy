@@ -45,12 +45,6 @@ def run(isQuick):
                             .format(str(bw), str(rtt), str(loss), str(run));
                         har_cmd = r'chrome-har-capturer -o {} {}'.format(harfile, url)
                         os.system(har_cmd);
-                        #run HAR capturer
-                        #cmd = har_cmd.split();
-                        #print(cmd)
-                        #process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE).wait()
-                        #time.sleep(5)
-                        #print(process.returncode)
 
     #reset traffic mod before each run
     os.system(reset_dnctl);
