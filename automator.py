@@ -32,7 +32,7 @@ def run(isQuick):
     for bw in [2, 10]: #unit Mbps
         for rtt in [0, 100]: #unit ms
             for loss in [0, 0.02]: #unit % in fraction
-                for run in range(1,51):
+                for run in range(1,31):
                     command = r'./trafficshaper.sh {b} {d} {p}'.format(b=bw, d=rtt, p=loss) 
                     print(command)
                     subprocess.call(shlex.split(command))
